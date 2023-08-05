@@ -1,0 +1,54 @@
+from ncclient import manager 
+from getpass import getpass 
+from xml.dom.minidom import parseString
+import os
+
+os.system('cls')
+
+# username = input("Username :")
+# password = getpass("Password :")
+
+device = {
+    'host':'sandbox-iosxe-recomm-1.cisco.com',
+    'port':'830',
+    'username':'developer',
+    'password':'lastorangerestoreball8876',
+    'hostkey_verify':False
+}
+
+netconf = manager.connect(**device)
+
+operation = input("What operation (delete|create) :")
+user_input = int(input("How many Loopbacks ?: "))
+n=150
+for abc in range (0, user_input):
+	payload = f"""
+		<config>
+		<interfaces xmlns="urn:ietf:params:xml:ns:yang:ietf-interfaces">
+			<interface nc:operation="{operation}" xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0">
+			<name>Loopback{n}</name>
+			<description>created by netconf interface{abc}</description>
+			<type xmlns:ianaift="urn:ietf:params:xml:ns:yang:iana-if-type">ianaift:softwareLoopback</type>
+			<enabled>true</enabled>
+			<link-up-down-trap-enable>enabled</link-up-down-trap-enable>
+			<ipv4 xmlns="urn:ietf:params:xml:ns:yang:ietf-ip">
+				<address>
+				<ip>172.16.{n}.1</ip>
+				<netmask>255.255.255.255</netmask>
+				</address>
+			</ipv4>
+			<ipv6 xmlns="urn:ietf:params:xml:ns:yang:ietf-ip"/>
+			</interface>
+		</interfaces>
+		</config>
+	"""
+	int_conf = netconf.edit_config(payload, target = 'running')
+	#print(type(int_conf))
+	str_ic = str(int_conf)
+
+	if "ok" in str_ic:
+		print("success")
+	else:
+		print("failed")
+	
+	n=n+1

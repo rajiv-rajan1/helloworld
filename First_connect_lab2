@@ -1,0 +1,46 @@
+from netmiko import ConnectHandler
+
+R1 = {
+    "ip":"192.168.1.10",
+    "device_type":"cisco_ios",
+    "username":"admin",
+    "password":"cisco",
+}
+ip_list = ["200.10.10.1", "200.10.11.1", "200.10.12.1", "200.10.13.1"]
+
+
+ssh = ConnectHandler(**R1)
+
+print("Connection Established sucessful")
+
+#### EX1 : For loop to pick an ip from the list  ####
+
+i=1
+for ip in ip_list:
+    commands = [f"interface loopback {i}", f"ip address {ip} 255.255.255.0", "description conf_by_netmiko"]
+    interface_configs =ssh.send_config_set(commands)
+    print(interface_configs)
+    int_details = ssh.send_command("show ip interface brief")
+    print(int_details)
+    i=i+1
+
+### EX2 : For loop to change an octect from the IP address ####
+
+for num in range(11, 101):
+    commands = [f"interface loopback {num}", f"ip address 200.10.{num}.1 255.255.255.0", "description conf_by_netmiko"]
+    interface_configs =ssh.send_config_set(commands)
+    print(interface_configs)
+    int_details = ssh.send_command("show ip interface brief")
+    print(int_details)
+
+#### EX3 :For loop to delete the interfaces  ####
+
+for num in range(1, 101):
+    commands = [f"no interface loopback {num}"]
+    interface_configs =ssh.send_config_set(commands)
+    print(interface_configs)
+    int_details = ssh.send_command("show ip interface brief")
+print(int_details)
+
+### EX4 : Pull the data from a file ####
+

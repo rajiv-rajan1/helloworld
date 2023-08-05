@@ -1,0 +1,28 @@
+from ncclient import manager 
+from getpass import getpass 
+from xml.dom.minidom import parseString
+import os
+
+os.system('cls')
+
+# username = input("Username :")
+# password = getpass("Password :")
+
+device = {
+    'host':'sandbox-iosxe-recomm-1.cisco.com',
+    'port':'830',
+    'username':'developer',
+    'password':'lastorangerestoreball8876',
+    'hostkey_verify':False
+}
+
+netconf = manager.connect(**device)
+
+running_configs = netconf.get_config(source ="running")
+pretty_running = parseString(running_configs.xml).toprettyxml()
+print(pretty_running)
+
+myfile = open("C:\\temp\\python\\run_conf_op.txt", "w")
+myfile.write(pretty_running)
+print("runningconfig exported")
+
